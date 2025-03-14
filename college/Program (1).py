@@ -1,80 +1,83 @@
 import spacy
-
 from nltk import sent_tokenize
+from nltk.tokenize import word_tokenize
+from collections import Counter
+from nltk.corpus import stopwords
+
 
 nlp = spacy.load("pt_core_news_lg")
 
-# funcao de abertura do arquivo
-def read_archive(d_archive_name):
-    with open(d_archive_name, encoding="utf8") as archive_content:
-        content = archive_content.read()
-    return content
+def ler_arquivo(nome_arquivo):
+    with open(nome_arquivo, encoding="utf8") as arquivo:
+        conteudo = arquivo.read()
+    return conteudo
 
-# funcao que retira as stopwords e retorna o conteudo em formato de string/texto
-def clear_content(d_initial_content):
-    content = nlp(d_initial_content)
-    cleared_content = ' '.join([token.text for token in content if not token.is_stop and token.text != ','])
-    return cleared_content
+def limpar_conteudo(conteudo_inicial):
+    conteudo = nlp(conteudo_inicial)  
+    conteudo_limpo = ' '.join([token.text for token in conteudo if not token.is_stop and token.text != ','])
+    return conteudo_limpo
 
-# funcao que tokeniza o conteudo do texto por sentencas
-def tokenize_content(d_cleared_content):
-    sentences = sent_tokenize(d_cleared_content, language="portuguese")
-    return sentences
+def tokenizar_conteudo(conteudo):
+    sentencas = sent_tokenize(conteudo, language="portuguese")
+    return sentencas
 
-# funcao que determina a similaridade entre as sentencas do texto
-def semantic_similarity(d_list_sentences):
-    bigrams = []
-    for i in range(len(d_list_sentences)-1):
-        bigrams.append({})
-        calc_similarity = nlp(d_list_sentences[i]).similarity(nlp(d_list_sentences[i+1]))
-        print("-------------------", i+1, "---------------------")
-        print("Primeira sentença: ", d_list_sentences[i])
-        print("Segunda sentença: ", d_list_sentences[i+1])
-        print("Similaridade: ", calc_similarity)
-        bigrams[i][f'Bigrama N°{i+1}'] = calc_similarity
-    print(bigrams)
-    return bigrams
+def dividir_por_similaridade(lista_sentencas, limite_similaridade=0.7):
+    paragrafos = []
+    paragrafo_atual = [lista_sentencas[0]]
 
-def similars(bigrams):
-    somatory = 0
-    count = 0
-    high_similarity = []
+    for i in range(len(lista_sentencas) - 1):
+        similaridade = nlp(lista_sentencas[i]).similarity(nlp(lista_sentencas[i + 1]))
 
-    index = 0
-    for item in bigrams:
-        somatory += float(item[f'Bigrama N°{index+1}'])
-        count += 1
-        index += 1
 
-    avrg = somatory/count
+        if similaridade > limite_similaridade:
+            paragrafo_atual.append(lista_sentencas[i + 1])
+        else:
+            paragrafos.append(" ".join(paragrafo_atual))
+            paragrafo_atual = [lista_sentencas[i + 1]]
 
-    index = -1
-    list_index = 0
-    for item in bigrams:
-        index += 1
-        if float(item[f'Bigrama N°{index+1}']) > avrg:
-            high_similarity.append(index+1)
 
-    high_similarityDICT = {}
-    print(avrg)
-    high_similarityDICT['índice dos similares'] = high_similarity 
-    print(high_similarityDICT)
-def subtopics(similar_sentences):
-    print()
+    if paragrafo_atual:
+        paragrafos.append(" ".join(paragrafo_atual))
 
-# main program
-print("""NLP EXTRACTOR INITIALIZED...
+    return paragrafos
+
+def topicos(paragrafos):
+    paragrafos_com_topicos = []
+    stop_words = set(stopwords.words('portuguese'))
+
+    for paragrafo in paragrafos:
+        doc = nlp(paragrafo)
+        entidades = set([ent.text for ent in doc.ents])
+
+        tokens = word_tokenize(paragrafo)
+        palavras = [palavra for palavra in tokens if palavra.lower() not in stop_words and palavra.isalpha()]
+        
+        count = Counter(palavras)
+        topicos_palavras = [item[0] for item in count.most_common(3)]
+        topicos_combinados = list(entidades) + topicos_palavras
+        topicos_formatados = ", ".join(topicos_combinados)
+        paragrafo_com_topicos = f"{paragrafo}\n\nTópicos extraídos: {topicos_formatados}"
+        paragrafos_com_topicos.append(paragrafo_com_topicos)
+
+    return paragrafos_com_topicos
+
+        
+
+
+print("""EXTRATOR DE NLP INICIALIZADO...
 -------------------------------------------------------------- 
-Insert the archive's name you want to obtain the data. 
-Don't forget to add the archive's format in your input.
+Insira o nome do arquivo do qual deseja extrair os dados. 
+Não se esqueça de incluir a extensão do arquivo no seu input.
 """)
 
-initial_content = read_archive('mariele.txt')
+nome_arquivo = input("Nome do arquivo (nome.extensão): ")
+conteudo_original = ler_arquivo(nome_arquivo)
+conteudo_limpo = limpar_conteudo(conteudo_original)
+lista_sentencas_limpo = tokenizar_conteudo(conteudo_limpo)
+lista_sentencas_original = tokenizar_conteudo(conteudo_original)
+paragrafos = dividir_por_similaridade(lista_sentencas_original)
+texto_final = topicos(paragrafos)
 
-content_cleared = clear_content(initial_content)
-
-list_content = tokenize_content(content_cleared)
-
-bigramas = semantic_similarity(list_content)
-
-similars(bigramas)
+for paragrafo in texto_final:
+    print(paragrafo)
+    print("\n" + "-"*50 + "\n")
