@@ -1,4 +1,4 @@
-#This code is about a hangman game. Previously developed to work in portuguese but then transcribed to english.
+#This code is about a hangman game. Previously developed to work in portuguese but then transcribed to english. Updates soon.
 
 import random, os, time, requests 
 
