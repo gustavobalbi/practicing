@@ -15,12 +15,6 @@ def read_file(file_name):
         content = file.read()
     return content
 
-def clean_content(initial_content):
-    """Removes stopwords and unnecessary characters from the text."""
-    content = nlp(initial_content)  
-    cleaned_content = ' '.join([token.text for token in content if not token.is_stop and token.text != ','])
-    return cleaned_content
-
 def tokenize_content(content):
     """Splits content into sentences."""
     sentences = sent_tokenize(content, language="portuguese")
@@ -80,8 +74,6 @@ Don't forget to include the file extension in your input.
 
 file_name = input("File name (name.extension): ")
 original_content = read_file(file_name)
-cleaned_content = clean_content(original_content)
-cleaned_sentence_list = tokenize_content(cleaned_content)
 original_sentence_list = tokenize_content(original_content)
 paragraphs = split_by_similarity(original_sentence_list)
 final_text = extract_topics(paragraphs)
