@@ -35,7 +35,7 @@ def split_by_similarity(sentence_list, similarity_threshold=0.7):
         return " ".join([token.text for token in nlp(sentence) if not token.is_stop])
 
     for i in range(len(sentence_list) - 1):
-        similarity = nlp(sentence_list[i]).similarity(nlp(sentence_list[i + 1]))
+        similarity = nlp(preprocess(sentence_list[i])).similarity(nlp(preprocess(sentence_list[i + 1])))
 
         if similarity > similarity_threshold:
             current_paragraph.append(sentence_list[i + 1])
@@ -45,7 +45,7 @@ def split_by_similarity(sentence_list, similarity_threshold=0.7):
 
     if current_paragraph:
         paragraphs.append(" ".join(current_paragraph))
-
+    
     return paragraphs
 
 def extract_topics(paragraphs):
@@ -64,7 +64,7 @@ def extract_topics(paragraphs):
         ]
         
         count = Counter(words)
-        top_words = [item[0] for item in count.most_common(3)]
+        top_words = [item[0] for item in count.most_common(2)]
         combined_topics = list(set(entities).union(set(top_words)))
         formatted_topics = ", ".join(combined_topics)
         paragraph_with_topics = f"{paragraph}\n\nExtracted topics: {formatted_topics}"
