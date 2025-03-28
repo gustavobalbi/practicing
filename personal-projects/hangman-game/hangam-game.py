@@ -24,7 +24,7 @@ def game_info(words):
     letters = len(chosen_word)
     return chosen_word, blank, letters
 
-def game_screen(chosen_word, blank, letters):
+def game_loop(chosen_word, blank, letters):
     lives = 5
     errors = []
     while lives > 0 and '_' in blank:
@@ -76,4 +76,4 @@ def input_check(chosen_word, blank, errors, lives):
 
 words = words_list()
 word, blank, letters = game_info(words)
-game_screen(word, blank, letters)
+game_loop(word, blank, letters)
