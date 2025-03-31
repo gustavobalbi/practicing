@@ -29,27 +29,24 @@ cybersecurity
 database
 debugging
 design
-encryption
+cryptography
 firewall
-framework
+structure
 frontend
 backend
 machine
 learning
-neural
-network
+neural network
 interface
-operating
-system
+operating system
 virtualization
 quantum
 robotics
 server
 storage
 syntax
-testing
-version
-control
+test
+version control
 wireless
 API
 bigdata
@@ -57,8 +54,7 @@ bit
 byte
 cache
 compiler
-data
-science
+data science
 database
 DNS
 domain
@@ -81,4 +77,4 @@ trojan
 upload
 virtual
 web
-website
+site
