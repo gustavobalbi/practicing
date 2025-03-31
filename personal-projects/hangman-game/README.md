@@ -1,4 +1,4 @@
-pip install requests keyboard
+#pip install requests keyboard
 
 >A entrada é responsiva ao pressionar das teclas. Durante o jogo, o usuário precisa confirmar seu palpite pressionando 'ENTER', garantindo que tenha certeza de sua escolha.
 >Suporte tanto para inglês quanto para português brasileiro.
